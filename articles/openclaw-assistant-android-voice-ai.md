@@ -9,16 +9,123 @@ published: true
 ## 📌 3行でわかるこの記事
 
 - 🎤 **ホームボタン長押し**や**ウェイクワード**でAIアシスタントを起動できるAndroidアプリ
-- 🔗 **任意のAIバックエンド**（OpenClaw, Ollama, OpenAI API等）に接続可能
+- 🔗 **OpenClaw**と連携して、Claude/GPT/Geminiなど任意のAIに接続可能
 - 🌐 **完全オープンソース**で日英両対応、カスタマイズ自由
 
 ## はじめに
 
 「OK Google」の代わりに、**自分のAI**を呼び出せたらいいと思いませんか？
 
-**OpenClaw Assistant**は、Androidのシステムアシスタント機能を使って、任意のAIバックエンドに接続できるオープンソースアプリです。
+**OpenClaw Assistant**は、Androidのシステムアシスタント機能を使って、[OpenClaw](https://github.com/openclaw/openclaw)経由で任意のAIバックエンドに接続できるオープンソースアプリです。
 
 https://github.com/yuga-hashimoto/OpenClawAssistant
+
+---
+
+## 🚀 セットアップガイド（完全版）
+
+### Step 1: OpenClawをインストール
+
+まずサーバー（Mac/Linux/Windows）にOpenClawをセットアップします。
+
+```bash
+# npmでインストール
+npm install -g openclaw
+
+# または直接実行
+npx openclaw
+```
+
+詳細: https://docs.openclaw.ai
+
+### Step 2: OpenClawの設定（config.yaml）
+
+`~/.openclaw/config.yaml` に以下を追加：
+
+```yaml
+# AIモデルの設定
+defaults:
+  model: anthropic/claude-sonnet-4  # または openai/gpt-4o, google/gemini-pro など
+
+# APIキーの設定（環境変数でもOK）
+providers:
+  anthropic:
+    apiKey: sk-ant-xxxxx  # Anthropic APIキー
+  # または
+  openai:
+    apiKey: sk-xxxxx  # OpenAI APIキー
+
+# 音声アシスタント用Webhookの設定
+hooks:
+  voice:
+    path: /hooks/voice
+    auth:
+      bearer: "your-secret-token"  # 任意のトークン（アプリ側と一致させる）
+```
+
+### Step 3: OpenClawを起動
+
+```bash
+# ゲートウェイを起動（バックグラウンド）
+openclaw gateway start
+
+# ステータス確認
+openclaw status
+```
+
+外部からアクセスするには、以下のいずれかが必要：
+- **ポートフォワーディング**（ルーターで18080ポートを開放）
+- **Cloudflare Tunnel**（推奨）
+- **Tailscale/ZeroTier**などのVPN
+
+#### Cloudflare Tunnelの例
+
+```bash
+# cloudflaredをインストール
+brew install cloudflare/cloudflare/cloudflared
+
+# トンネル作成
+cloudflared tunnel create openclaw
+cloudflared tunnel route dns openclaw your-subdomain.yourdomain.com
+
+# 設定ファイル (~/.cloudflared/config.yml)
+tunnel: <tunnel-id>
+credentials-file: ~/.cloudflared/<tunnel-id>.json
+ingress:
+  - hostname: your-subdomain.yourdomain.com
+    service: http://localhost:18080
+  - service: http_status:404
+
+# 起動
+cloudflared tunnel run openclaw
+```
+
+### Step 4: Androidアプリのインストール
+
+1. [Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases) からAPKをダウンロード
+2. インストール（「提供元不明のアプリ」を許可）
+
+### Step 5: アプリの設定
+
+1. アプリを開く
+2. 右上の⚙️から設定画面へ
+3. 以下を入力：
+
+| 項目 | 値 |
+|------|-----|
+| **Webhook URL** | `https://your-subdomain.yourdomain.com/hooks/voice` |
+| **Auth Token** | config.yamlで設定した`bearer`トークン |
+
+4. 「Test Connection」で接続確認
+5. 「Save」で保存
+
+### Step 6: システムアシスタントに設定
+
+1. Android設定 → アプリ → デフォルトのアプリ → デジタルアシスタント
+2. 「OpenClaw Assistant」を選択
+3. ホームボタン長押しで起動！
+
+---
 
 ## ✨ 主な機能
 
@@ -26,13 +133,9 @@ https://github.com/yuga-hashimoto/OpenClawAssistant
 
 Googleアシスタントの代わりに、OpenClaw Assistantをデフォルトアシスタントに設定できます。
 
-```
-設定 → アプリ → デフォルトアプリ → デジタルアシスタント → OpenClaw Assistant
-```
-
 ### 🎤 カスタムウェイクワード
 
-「Open Claw」「Jarvis」「Computer」など、好きなウェイクワードを選択可能。カスタムワードも設定できます。
+「Open Claw」「Jarvis」「Computer」など、好きなウェイクワードを選択可能。
 
 オフライン音声認識エンジン [Vosk](https://alphacephei.com/vosk/) を使用しているため、ウェイクワード検知はデバイス内で完結します。
 
@@ -42,36 +145,36 @@ Googleアシスタントの代わりに、OpenClaw Assistantをデフォルト�
 - **音声合成**: Android標準のTextToSpeech
 - **連続会話モード**: AI応答後に自動でマイクを再起動
 
-### 🔗 任意のバックエンドに接続
+---
 
-Webhook URLを設定するだけで、どんなAIバックエンドにも接続できます。
+## 📡 通信フォーマット
 
-```yaml
-# OpenClawの設定例
-hooks:
-  voice:
-    path: /hooks/voice
-    auth:
-      bearer: "your-token"
-```
+### リクエスト（アプリ → OpenClaw）
 
-**対応フォーマット:**
-```json
-// リクエスト
+```http
 POST /hooks/voice
-{"message": "今日の天気は？", "session_id": "uuid-xxx"}
+Content-Type: application/json
+Authorization: Bearer your-secret-token
 
-// レスポンス（以下のいずれか）
-{"response": "東京は晴れです"}
-{"text": "東京は晴れです"}
-{"message": "東京は晴れです"}
+{
+  "message": "今日の天気は？",
+  "session_id": "uuid-xxx-xxx"
+}
 ```
 
-## 📱 スクリーンショット
+### レスポンス（OpenClaw → アプリ）
 
-| ホーム画面 | 設定画面 | チャット画面 |
-|:---:|:---:|:---:|
-| ステータス表示・起動方法選択 | Webhook・音声・ウェイクワード設定 | テキスト＆音声入力対応 |
+```json
+{"response": "東京は晴れ、気温は15度です。"}
+```
+
+または：
+```json
+{"text": "..."}
+{"message": "..."}
+```
+
+---
 
 ## 🛠 技術スタック
 
@@ -86,25 +189,7 @@ POST /hooks/voice
 | 通信 | OkHttp + Gson |
 | セキュリティ | EncryptedSharedPreferences |
 
-## 🚀 インストール方法
-
-### APKダウンロード
-
-[Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases) からAPKをダウンロードしてインストール。
-
-### ソースからビルド
-
-```bash
-git clone https://github.com/yuga-hashimoto/OpenClawAssistant.git
-cd OpenClawAssistant
-./gradlew assembleDebug
-```
-
-## 🌐 多言語対応
-
-アプリはデバイスの言語設定に自動追従します：
-- 🇯🇵 日本語
-- 🇺🇸 英語
+---
 
 ## 💡 ユースケース
 
@@ -112,13 +197,21 @@ cd OpenClawAssistant
 
 Ollamaなどのローカルで動くLLMと組み合わせれば、**完全オフライン**の音声アシスタントが実現できます。
 
+```yaml
+# OpenClawでOllamaを使う設定
+defaults:
+  model: ollama/llama3
+
+providers:
+  ollama:
+    baseUrl: http://localhost:11434
+```
+
 ### スマートホーム連携
 
 Home Assistantなどと連携して、音声でスマートホームを操作。
 
-### カスタムワークフロー
-
-n8n、Make、Zapierなどのワークフロー自動化ツールと連携可能。
+---
 
 ## 🤝 コントリビュート
 
