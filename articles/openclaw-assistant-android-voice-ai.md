@@ -20,6 +20,8 @@ published: true
 
 https://github.com/yuga-hashimoto/OpenClawAssistant
 
+📹 **デモ動画**: https://x.com/i/status/2017914589938438532
+
 ---
 
 ## 🚀 セットアップガイド
