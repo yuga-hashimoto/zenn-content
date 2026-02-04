@@ -29,24 +29,13 @@ https://github.com/yuga-hashimoto/OpenClawAssistant
 OpenClawにWebhookを設定します。以下の指示をあなたのOpenClawにコピペしてください：
 
 ```
-Android音声アシスタント用のWebhookを作成してください。
+OpenClaw Assistant用のWebhookを設定してください。
 
-要件：
-- パス: /hooks/voice
-- 認証: Bearer トークン（安全なランダム文字列を生成）
-- 外部からHTTPSでアクセス可能にする（Cloudflare Tunnel推奨）
+GitHub: https://github.com/yuga-hashimoto/OpenClawAssistant
 
-リクエスト形式:
-POST /hooks/voice
-Content-Type: application/json
-Authorization: Bearer <token>
-{
-  "message": "ユーザーの発話テキスト",
-  "session_id": "セッションID"
-}
-
-レスポンス形式:
-{"response": "AIの応答テキスト"}
+- hooksにvoice用のエンドポイントを追加
+- Bearer認証トークンを設定
+- ngrokで外部公開
 
 設定が完了したら、Webhook URLとトークンを教えてください。
 ```
