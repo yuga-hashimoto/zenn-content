@@ -34,10 +34,10 @@ OpenClaw Assistant用のWebhookを設定してください。
 GitHub: https://github.com/yuga-hashimoto/OpenClawAssistant
 
 - hooksにvoice用のエンドポイントを追加
-- Bearer認証トークンを設定
+- Bearer認証トークンを設定（任意）
 - ngrokで外部公開
 
-設定が完了したら、Webhook URLとトークンを教えてください。
+設定が完了したら、Webhook URLを教えてください（トークンを設定した場合はそれも）。
 ```
 
 ### Step 2: Androidアプリのインストール
@@ -54,7 +54,7 @@ GitHub: https://github.com/yuga-hashimoto/OpenClawAssistant
 | 項目 | 値 |
 |------|-----|
 | **Webhook URL** | OpenClawから取得したURL |
-| **Auth Token** | Webhookのトークン |
+| **Auth Token** | Webhookのトークン（任意） |
 
 4. 「Test Connection」で接続確認
 5. 「Save」で保存
