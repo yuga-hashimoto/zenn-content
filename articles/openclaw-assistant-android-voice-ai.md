@@ -1,5 +1,5 @@
 ---
-title: "OpenClaw Assistant - あなたのAIをAndroidの音声アシスタントにするOSSアプリ"
+title: "OpenClaw Assistant - あなたのOpenClawをAndroidの音声アシスタントにするOSSアプリを作ってみた"
 emoji: "🤖"
 type: "tech"
 topics: ["Android", "AI", "OpenSource", "音声認識", "Kotlin"]
