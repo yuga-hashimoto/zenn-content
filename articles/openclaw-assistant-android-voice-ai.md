@@ -26,13 +26,30 @@ https://github.com/yuga-hashimoto/OpenClawAssistant
 
 ### Step 1: OpenClawでWebhookを作成
 
-OpenClawにWebhookを設定します。
+OpenClawにWebhookを設定します。以下の指示をあなたのOpenClawにコピペしてください：
 
-**設定方法がわからない場合は、あなたのOpenClawに直接聞いてください：**
+```
+Android音声アシスタント用のWebhookを作成してください。
 
-> 「Android音声アシスタント用のWebhookを作成して」
+要件：
+- パス: /hooks/voice
+- 認証: Bearer トークン（安全なランダム文字列を生成）
+- 外部からHTTPSでアクセス可能にする（Cloudflare Tunnel推奨）
 
-OpenClawが必要な設定を案内してくれます。
+リクエスト形式:
+POST /hooks/voice
+Content-Type: application/json
+Authorization: Bearer <token>
+{
+  "message": "ユーザーの発話テキスト",
+  "session_id": "セッションID"
+}
+
+レスポンス形式:
+{"response": "AIの応答テキスト"}
+
+設定が完了したら、Webhook URLとトークンを教えてください。
+```
 
 ### Step 2: Androidアプリのインストール
 
@@ -48,7 +65,7 @@ OpenClawが必要な設定を案内してくれます。
 | 項目 | 値 |
 |------|-----|
 | **Webhook URL** | OpenClawから取得したURL |
-| **Auth Token** | Webhookのトークン（設定した場合） |
+| **Auth Token** | Webhookのトークン |
 
 4. 「Test Connection」で接続確認
 5. 「Save」で保存
@@ -78,29 +95,6 @@ Googleアシスタントの代わりに、OpenClaw Assistantをデフォルト�
 - **音声認識**: Android標準のSpeechRecognizer
 - **音声合成**: Android標準のTextToSpeech
 - **連続会話モード**: AI応答後に自動でマイクを再起動
-
----
-
-## 📡 通信フォーマット
-
-### リクエスト（アプリ → OpenClaw）
-
-```http
-POST /hooks/voice
-Content-Type: application/json
-Authorization: Bearer your-token
-
-{
-  "message": "今日の天気は？",
-  "session_id": "uuid-xxx-xxx"
-}
-```
-
-### レスポンス（OpenClaw → アプリ）
-
-```json
-{"response": "東京は晴れ、気温は15度です。"}
-```
 
 ---
 
