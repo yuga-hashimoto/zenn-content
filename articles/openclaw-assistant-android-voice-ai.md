@@ -22,90 +22,24 @@ https://github.com/yuga-hashimoto/OpenClawAssistant
 
 ---
 
-## 🚀 セットアップガイド（完全版）
+## 🚀 セットアップガイド
 
-### Step 1: OpenClawをインストール
+### Step 1: OpenClawでWebhookを作成
 
-まずサーバー（Mac/Linux/Windows）にOpenClawをセットアップします。
+OpenClawにWebhookを設定します。
 
-```bash
-# npmでインストール
-npm install -g openclaw
+**設定方法がわからない場合は、あなたのOpenClawに直接聞いてください：**
 
-# または直接実行
-npx openclaw
-```
+> 「Android音声アシスタント用のWebhookを作成して」
 
-詳細: https://docs.openclaw.ai
+OpenClawが必要な設定を案内してくれます。
 
-### Step 2: OpenClawの設定（config.yaml）
-
-`~/.openclaw/config.yaml` に以下を追加：
-
-```yaml
-# AIモデルの設定
-defaults:
-  model: anthropic/claude-sonnet-4  # または openai/gpt-4o, google/gemini-pro など
-
-# APIキーの設定（環境変数でもOK）
-providers:
-  anthropic:
-    apiKey: sk-ant-xxxxx  # Anthropic APIキー
-  # または
-  openai:
-    apiKey: sk-xxxxx  # OpenAI APIキー
-
-# 音声アシスタント用Webhookの設定
-hooks:
-  voice:
-    path: /hooks/voice
-    auth:
-      bearer: "your-secret-token"  # 任意のトークン（アプリ側と一致させる）
-```
-
-### Step 3: OpenClawを起動
-
-```bash
-# ゲートウェイを起動（バックグラウンド）
-openclaw gateway start
-
-# ステータス確認
-openclaw status
-```
-
-外部からアクセスするには、以下のいずれかが必要：
-- **ポートフォワーディング**（ルーターで18080ポートを開放）
-- **Cloudflare Tunnel**（推奨）
-- **Tailscale/ZeroTier**などのVPN
-
-#### Cloudflare Tunnelの例
-
-```bash
-# cloudflaredをインストール
-brew install cloudflare/cloudflare/cloudflared
-
-# トンネル作成
-cloudflared tunnel create openclaw
-cloudflared tunnel route dns openclaw your-subdomain.yourdomain.com
-
-# 設定ファイル (~/.cloudflared/config.yml)
-tunnel: <tunnel-id>
-credentials-file: ~/.cloudflared/<tunnel-id>.json
-ingress:
-  - hostname: your-subdomain.yourdomain.com
-    service: http://localhost:18080
-  - service: http_status:404
-
-# 起動
-cloudflared tunnel run openclaw
-```
-
-### Step 4: Androidアプリのインストール
+### Step 2: Androidアプリのインストール
 
 1. [Releases](https://github.com/yuga-hashimoto/OpenClawAssistant/releases) からAPKをダウンロード
 2. インストール（「提供元不明のアプリ」を許可）
 
-### Step 5: アプリの設定
+### Step 3: アプリの設定
 
 1. アプリを開く
 2. 右上の⚙️から設定画面へ
@@ -113,13 +47,13 @@ cloudflared tunnel run openclaw
 
 | 項目 | 値 |
 |------|-----|
-| **Webhook URL** | `https://your-subdomain.yourdomain.com/hooks/voice` |
-| **Auth Token** | config.yamlで設定した`bearer`トークン |
+| **Webhook URL** | OpenClawから取得したURL |
+| **Auth Token** | Webhookのトークン（設定した場合） |
 
 4. 「Test Connection」で接続確認
 5. 「Save」で保存
 
-### Step 6: システムアシスタントに設定
+### Step 4: システムアシスタントに設定
 
 1. Android設定 → アプリ → デフォルトのアプリ → デジタルアシスタント
 2. 「OpenClaw Assistant」を選択
@@ -154,7 +88,7 @@ Googleアシスタントの代わりに、OpenClaw Assistantをデフォルト�
 ```http
 POST /hooks/voice
 Content-Type: application/json
-Authorization: Bearer your-secret-token
+Authorization: Bearer your-token
 
 {
   "message": "今日の天気は？",
@@ -166,12 +100,6 @@ Authorization: Bearer your-secret-token
 
 ```json
 {"response": "東京は晴れ、気温は15度です。"}
-```
-
-または：
-```json
-{"text": "..."}
-{"message": "..."}
 ```
 
 ---
@@ -193,35 +121,15 @@ Authorization: Bearer your-secret-token
 
 ## 💡 ユースケース
 
-### ローカルLLMと連携
-
-Ollamaなどのローカルで動くLLMと組み合わせれば、**完全オフライン**の音声アシスタントが実現できます。
-
-```yaml
-# OpenClawでOllamaを使う設定
-defaults:
-  model: ollama/llama3
-
-providers:
-  ollama:
-    baseUrl: http://localhost:11434
-```
-
-### スマートホーム連携
-
-Home Assistantなどと連携して、音声でスマートホームを操作。
+- **ローカルLLM**: Ollamaと組み合わせて完全オフラインの音声アシスタント
+- **スマートホーム**: Home Assistantと連携して音声操作
+- **カスタムワークフロー**: n8n、Make、Zapierなどと連携
 
 ---
 
 ## 🤝 コントリビュート
 
 Pull Requests歓迎！Issues報告もお気軽にどうぞ。
-
-## まとめ
-
-OpenClaw Assistantは、**あなたのAIをAndroidのネイティブ音声アシスタントにする**オープンソースアプリです。
-
-Googleアシスタントに依存せず、自分だけのAIアシスタントを構築したい方はぜひお試しください！
 
 ## リンク
 
