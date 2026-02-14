@@ -1,98 +1,69 @@
 ---
-title: "【GLM-5】744Bパラメータの中国発オープンソースAI、Claude Opus 4.5に迫る実力を徹底解説"
-emoji: "🧠"
+title: "【GLM-5】Claude CodeやCursorと同等性能で月$10〜。AIコーディングの価格破壊が始まった"
+emoji: "💸"
 type: "tech"
-topics: ["AI", "LLM", "GLM5", "オープンソース", "MoE"]
+topics: ["AI", "LLM", "GLM5", "ClaudeCode", "Cursor"]
 published: true
 ---
 
 ## 📌 3行でわかるこの記事
 
-- 🇨🇳 中国・智譜AI（Z.ai）が744Bパラメータの次世代モデル「GLM-5」を2026年2月11日にリリース
-- 🏆 SWE-bench Verifiedで77.8%を達成し、オープンソースモデルとして世界最高水準の性能
-- 📄 Word/PDF/Excelを自動生成する「Agent Mode」搭載、MITライセンスで完全無料公開
+- 💸 Claude Max（月$100〜$200）やCursor Pro（月$20+従量課金）と同等性能が、**GLM Coding Planなら月$10〜$20**で使える
+- 🏆 GLM-5はSWE-bench Verified 77.8%でClaude Opus 4.5（80.9%）に迫るOSS最高スコア
+- 🔧 Claude Code / Cursor / Cline / OpenCode など20以上のコーディングツールにそのまま対応
 
-## はじめに
+## はじめに：AIコーディング、高すぎませんか？
 
-2026年2月11日、中国のAI企業**智譜AI（Z.ai）**が次世代大規模言語モデル**GLM-5**を発表しました。744Bパラメータという巨大なMixture-of-Experts（MoE）アーキテクチャを採用し、コーディング・推論・エージェント能力においてClaude Opus 4.5に迫る性能を実現しています。
+Claude Codeを本格的に使おうとすると**Claude Max $100/月〜$200/月**。CursorもPro $20/月に加えて、使い込むと従量課金が加算されていく。
 
-MITライセンスでのオープンソース公開という点でも注目を集めており、本記事ではその技術的詳細と実力を解説します。
+「AIコーディングは便利だけど、毎月の出費が痛い」
+
+そう感じている開発者に朗報です。2026年2月11日、中国の智譜AI（Z.ai）がリリースした**GLM-5**は、Claude Opus 4.5に迫るコーディング性能を持ちながら、**月$10〜$20の定額プラン**で使えます。
+
+本記事では、GLM-5が実際にどれだけ使えるのか、どうやって導入するのか、そしていくらかかるのかを解説します。
 
 ![GLM-5 ベンチマーク結果](https://github.com/zai-org/GLM-5/raw/main/resources/bench.png)
 *(出典: [zai-org/GLM-5 GitHub](https://github.com/zai-org/GLM-5))*
 
-## GLM-5の基本スペック
+## GLM-5はどれだけ「使える」のか？
 
-| 項目 | GLM-4.5 | GLM-5 |
-|------|---------|-------|
-| 総パラメータ数 | 355B | 744B |
-| アクティブパラメータ | 32B | 40B |
-| エキスパート数 | - | 256（同時8基稼働） |
-| スパース率 | - | 5.9% |
-| コンテキスト長 | 128K | 200K |
-| 事前学習データ | 23Tトークン | 28.5Tトークン |
-| ライセンス | Apache 2.0 | MIT |
+### コーディング性能：Claude Opus 4.5の96%に到達
 
-### アーキテクチャの特徴
+最も重要なベンチマークであるSWE-bench Verified（実際のGitHub Issueを解決する能力）の比較です。
 
-GLM-5はMixture-of-Experts（MoE）構造を採用しています。256個のエキスパートのうち、1トークンあたり8個のみが活性化される仕組みです。これにより744Bの総パラメータを持ちながら、推論時のアクティブパラメータは40Bに抑えられ、効率的な推論が可能です。
+| モデル | SWE-bench Verified | Terminal Bench 2.0 | 月額コスト |
+|--------|-------------------|-------------------|-----------|
+| Claude Opus 4.5 | 80.9% | 58.1 | $100〜$200 |
+| GPT-5.2 | 80.0% | - | $200 |
+| **GLM-5** | **77.8%** | **56.2** | **$10〜$20** |
+| Gemini 3.0 Pro | 73.2% | - | $19.99〜 |
 
-```mermaid
-graph LR
-    A[入力トークン] --> B[ルーター]
-    B --> C1[Expert 1]
-    B --> C2[Expert 2]
-    B --> C3[Expert 3]
-    B --> C4[...]
-    B --> C8[Expert 8]
-    C1 --> D[出力統合]
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C8 --> D
-    D --> E[出力トークン]
-    style B fill:#f9f,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-```
+GLM-5のスコア77.8%はClaude Opus 4.5の**96%の性能**です。この3%の差に**毎月$80〜$180の差額**を払う価値があるかどうか——多くの開発者にとって、答えは明白でしょう。
 
-> 256個のエキスパートからトークンごとに最適な8個を選択して処理
+### 前モデルGLM-4.7からの進化
 
-さらに、DeepSeekが開発した**Dynamically Sparse Attention（DSA）**を統合し、最大200Kトークンの長文脈を効率的に処理します。
+GLM-5は2025年12月リリースのGLM-4.7から大幅に強化されています。
 
-## 訓練基盤：Huawei Ascendチップで完全独立
+| 項目 | GLM-4.7 | GLM-5 | 進化幅 |
+|------|---------|-------|--------|
+| 総パラメータ数 | 355B | 744B | 2.1倍 |
+| アクティブパラメータ | 32B | 40B | 1.25倍 |
+| コンテキスト長 | 200K | 200K | 同等 |
+| 事前学習データ | 23Tトークン | 28.5Tトークン | +24% |
+| SWE-bench Verified | 73.8% | 77.8% | **+4.0pt** |
+| Terminal Bench 2.0 | 41.0 | 56.2 | **+15.2pt** |
+| AIME 2025 | 95.7% | 97.2% | +1.5pt |
+| BrowseComp | 67 | OSS最高 | 大幅向上 |
+| τ²-Bench | 84.7 | OSS最高 | 大幅向上 |
+| ライセンス | MIT | MIT | 同じ |
 
-GLM-5の最も注目すべき点の一つは、**Huawei Ascendチップ**とMindSporeフレームワークのみで訓練されたことです。米国製GPU（NVIDIA A100/H100）に依存せず、中国国内のハードウェアのみで最先端モデルの訓練を実現しました。
+特に**Terminal Bench 2.0が+15.2pt**の大幅向上。これはターミナル上での複雑なタスク遂行能力（＝Claude Codeのようなエージェント利用）が飛躍的に改善されたことを意味します。
 
-### 「slime」：新しい非同期強化学習基盤
+### ハルシネーションが業界最低水準
 
-大規模モデルの強化学習（RL）訓練は、従来、スケーラビリティが課題でした。智譜AIは**「slime」**と呼ばれる新しい非同期RLインフラを開発し、以下を実現しています：
+GLM-5は**AA-Omniscience Index**でスコア-1を記録。前世代から35ポイント改善し、「知らないことは知らないと答える」能力でAI業界トップです。コーディング中に嘘の関数名やAPIを提案されるストレスが大幅に減ります。
 
-- トレーニングスループットの大幅改善
-- より細粒度のポストトレーニングの反復
-- 事前学習と事後学習の両面での効率化
-
-## ベンチマーク性能
-
-### コーディング能力
-
-GLM-5はコーディングベンチマークにおいて、オープンソースモデルとして世界最高水準を達成しています。
-
-| ベンチマーク | GLM-5 | Claude Opus 4.5 | Gemini 3.0 Pro | GPT-5.2 |
-|-------------|-------|------------------|----------------|---------|
-| SWE-bench Verified | **77.8** | 80.9 | 73.2 | 80.0 |
-| Terminal Bench 2.0 | **56.2** | 58.1 | - | - |
-| CC-Bench-V2 | 高スコア | 最高水準 | - | - |
-
-SWE-bench Verifiedの77.8%は、Claude Opus 4.5（80.9%）に迫る数値であり、オープンソースモデルとしては最高スコアです。
-
-![GLM-5 実世界ベンチマーク](https://github.com/zai-org/GLM-5/raw/main/resources/realworld_bench.png)
-*(出典: [zai-org/GLM-5 GitHub](https://github.com/zai-org/GLM-5))*
-
-### ハルシネーション抑制
-
-GLM-5は**AA-Omniscience Index**でスコア-1を記録し、前世代から35ポイントの改善を達成しました。これは「知らないことは知らないと答える」能力が飛躍的に向上したことを意味し、AI業界全体でトップの信頼性です。
-
-### エージェント能力
+### エージェント能力もOSS最強
 
 | ベンチマーク | 評価内容 | GLM-5の成績 |
 |-------------|---------|------------|
@@ -103,213 +74,170 @@ GLM-5は**AA-Omniscience Index**でスコア-1を記録し、前世代から35�
 
 ## GLM-5は何に使えるのか？
 
-GLM-5は汎用LLMですが、特に以下の用途で強みを発揮します。
+### 1. 普段のコーディング作業（最大の用途）
 
-### 1. AIコーディングアシスタント
-
-SWE-bench Verified 77.8%が示す通り、**実際のGitHub Issueを解決できるレベル**のコーディング能力を持っています。
+今Claude CodeやCursorでやっていることが、そのままGLM-5でできます。
 
 - バグ修正・機能追加の自動実装
 - コードレビュー・リファクタリング
 - テストコード生成
-- **Claude Code / Cline / Roo Code / Kilo Code** などの主要コーディングツールで直接利用可能
+- 複数ファイルにまたがる大規模な変更
 
-特にClaude MaxやCursor Proの料金（月$100〜$200）が負担に感じている開発者にとって、GLM-5は**圧倒的に安い代替手段**です。
+**対応ツール：**
+Claude Code / Cursor / Cline / OpenCode / Roo Code / Kilo Code / Goose / OpenClaw など**20以上のツール**
+
+つまり、今使っているツールを変える必要はありません。**バックエンドのモデルをGLM-5に差し替えるだけ**で、月額コストが1/10以下になります。
 
 ### 2. ドキュメント・事務作業の自動化（Agent Mode）
 
-GLM-5のネイティブ**Agent Mode**は、プロンプトから直接オフィスドキュメントを生成できます。
+GLM-5にはネイティブの**Agent Mode**が搭載されており、プロンプトから直接オフィスドキュメントを生成できます。
 
 - 📝 **Word文書**（.docx）：書式設定・表・図の挿入付き
 - 📊 **Excel**（.xlsx）：データ整理・グラフ生成
 - 📄 **PDF**：チャート付きレポート生成
 
-```mermaid
-graph TD
-    A[ユーザーの指示] --> B[GLM-5 Agent Mode]
-    B --> C{出力形式を判断}
-    C --> D[.docx生成]
-    C --> E[.xlsx生成]
-    C --> F[.pdf生成]
-    D --> G[書式・表・図を自動挿入]
-    E --> H[データ整理・グラフ作成]
-    F --> I[チャート付きレポート]
-```
+会議資料、週次レポート、データ分析表など、定型業務を丸投げできます。
 
-会議資料、レポート、データ分析表などの定型業務を大幅に効率化できます。
+### 3. エージェントタスク・Web調査
 
-### 3. エージェントタスク・情報収集
+BrowseComp・MCP-Atlas・τ²-Benchで全てOSS最高スコア。以下のような複雑なタスクが得意です。
 
-BrowseComp・MCP-Atlas・τ²-Benchで全てOSS最高スコアを記録しており、以下のようなマルチステップタスクが得意です。
-
-- Web検索→情報統合→レポート作成
+- Web検索 → 情報統合 → レポート作成
 - 複数ツールを組み合わせた多段階ワークフロー
 - 長期的な計画立案と意思決定
 
-### 4. オンプレミス・プライベート環境でのAI活用
+### 4. 機密環境でのプライベートAI
 
-MITライセンスのオープンソースなので、**自社サーバーに完全にデプロイ可能**です。機密データを外部に出せない企業にとって、API型サービスでは実現できない利用形態です。
+MITライセンスのオープンソースなので、**自社サーバーに完全デプロイ可能**です。社外にコードを出せない環境でも使えます。
 
-## どうやって使うのか？
+## いくらかかるのか？（料金比較）
 
-GLM-5を利用する方法は大きく4つあります。
+### GLM Coding Plan vs 競合サービス
 
-### 方法1: GLM Coding Plan（最もお手軽）
+まず、各サービスの月額コストを並べます。
 
-**コーディングツールで使うなら最もコスパが良い方法**です。Claude Code、Cline、Roo Codeなど20以上のツールに対応しています。
+| サービス | 月額料金 | 備考 |
+|----------|---------|------|
+| Claude Max 5x | $100/月 | Claude Code用 |
+| Claude Max 20x | $200/月 | ヘビーユーザー向け |
+| Cursor Pro | $20/月 + 従量課金 | 使い込むと$50〜$100超えも |
+| Windsurf | $15/月 + 従量課金 | |
+| **GLM Coding Pro** | **≒$10/月** | **Claude Code/Cursor対応** |
+| **GLM Coding Max** | **≒$20/月** | **2,400プロンプト/5時間** |
+| **GLM Coding Lite** | **$6/月** | **GLM-4.7対応（GLM-5は近日対応）** |
 
-**ステップ：**
-1. [z.ai/subscribe](https://z.ai/subscribe) にアクセス
-2. プランを選択して登録
-3. APIキーを取得
-4. お使いのコーディングツールにAPIキーを設定
+:::message
+**Claude Max $100/月の代わりにGLM Coding Pro $10/月。同じClaude Code上で使えて、コストは1/10。**
+:::
 
-**Claude Codeでの設定例：**
-```bash
-# Claude Codeの設定でAPIプロバイダーを変更
-claude config set apiProvider openai-compatible
-claude config set apiBaseUrl https://open.bigmodel.cn/api/paas/v4
-claude config set apiKey YOUR_GLM_API_KEY
-claude config set model glm-5
-```
-
-**Clineでの設定：**
-VSCodeのCline拡張設定で、API ProviderをOpenAI Compatibleに変更し、Base URLとAPIキーを入力するだけです。
-
-### 方法2: API直接利用（OpenAI互換）
-
-自前のアプリケーションに組み込む場合はこちら。OpenAI SDKがそのまま使えます。
-
-```python
-import openai
-
-client = openai.OpenAI(
-    base_url="https://open.bigmodel.cn/api/paas/v4",
-    api_key="YOUR_API_KEY"
-)
-
-response = client.chat.completions.create(
-    model="glm-5",
-    messages=[
-        {"role": "user", "content": "Pythonでクイックソートを実装して"}
-    ],
-    max_tokens=4096
-)
-
-print(response.choices[0].message.content)
-```
-
-Java SDKも提供されています（`zai-sdk` v0.3.3）。
-
-### 方法3: OpenRouter経由
-
-すでにOpenRouterを使っている方はモデル指定を変えるだけです。
-
-```python
-import openai
-
-client = openai.OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key="YOUR_OPENROUTER_KEY"
-)
-
-response = client.chat.completions.create(
-    model="zai/glm-5",
-    messages=[
-        {"role": "user", "content": "ReactでTodoアプリを作って"}
-    ]
-)
-```
-
-### 方法4: セルフホスティング（上級者向け）
-
-Hugging FaceからMITライセンスでウェイトをダウンロードし、自社サーバーで運用できます。
-
-```bash
-# Hugging Faceからダウンロード
-huggingface-cli download zai-org/GLM-5
-
-# vLLMで起動
-python -m vllm.entrypoints.openai.api_server \
-    --model zai-org/GLM-5 \
-    --tensor-parallel-size 8
-```
-
-- **vLLM / SGLang** で動作
-- FP8量子化版も提供
-- **必要メモリ: 約1,490GB**（マルチGPU環境が必須）
-
-### 方法5: chat.z.aiで試す（無料お試し）
-
-[chat.z.ai](https://chat.z.ai) にアクセスすれば、ブラウザ上で直接GLM-5を試せます。新規登録で無料クレジットが付与されるので、まずはここで実力を確認するのがおすすめです。
-
-## いくらかかるのか？
-
-### GLM Coding Plan（コーディングツール向けサブスクリプション）
-
-Claude Code / Cline / Roo Codeなどで使う場合の**定額プラン**です。
+### GLM Coding Planの詳細
 
 | プラン | 料金 | 5時間あたりの利用量 | GLM-5対応 |
 |--------|------|---------------------|-----------|
-| **Lite** | $6/月 | 約120プロンプト | 近日対応予定 |
+| **Lite** | $6/月 | 約120プロンプト | GLM-4.7対応（GLM-5は近日対応） |
 | **Pro** | $30/四半期（≒$10/月） | 約600プロンプト | ✅ |
 | **Max** | $60/四半期（≒$20/月） | 約2,400プロンプト | ✅ |
 
-:::message
-**Claude Max（$100〜$200/月）と比較すると1/10〜1/30の料金**で、同等レベルのAIコーディング支援を受けられます。
-:::
+5時間ごとにプロンプト数がリセットされるサイクル制です。使い切っても追加課金は発生せず、次のサイクルまで待てばまた使えます。**予想外の高額請求が来ることがないので安心**です。
 
-> 既存ユーザーは現行価格が維持されますが、GLM-5リリースに伴い新規登録者は30〜60%の値上げが適用されています。
+### API従量課金（アプリ開発者向け）
 
-### API従量課金
-
-アプリケーションに組み込む場合の料金です。
+自前のアプリケーションに組み込む場合の料金比較です。
 
 | モデル | 入力（/百万トークン） | 出力（/百万トークン） |
 |--------|----------------------|----------------------|
-| **GLM-5** | $1.00 | $3.20 |
+| **GLM-5** | **$1.00** | **$3.20** |
 | Claude Opus 4.6 | $5.00 | $25.00 |
 | GPT-5.2 | $1.75 | $14.00 |
 | Gemini 3.0 Pro | $2.00 | $12.00 |
 
 :::message alert
-GLM-5のAPI料金はClaude Opus 4.6と比較して**入力5倍、出力約8倍安い**です。性能差を考慮しても圧倒的なコストパフォーマンスです。
+GLM-5はClaude Opus 4.6と比較して**入力5倍、出力約8倍安い**。API利用でも圧倒的なコストパフォーマンスです。
 :::
 
-### セルフホスティング
+## どうやって使うのか？
 
-モデルウェイト自体は**MITライセンスで無料**です。ただし、推論に約1,490GBのメモリが必要なため、ハードウェアコストは相応にかかります。クラウドGPUインスタンスを利用する場合、8×H100構成で$20〜30/時間程度が目安です。
+### 方法1: GLM Coding Plan（おすすめ）
 
-## 「Pony Alpha」の正体
+**いま使っているコーディングツールで、そのままGLM-5を使う最もお手軽な方法**です。
 
-2026年2月上旬、OpenRouterに突如現れた謎のモデル「**Pony Alpha**」がコーディング能力でClaude Opusに迫ると話題になりました。GitHubのPRやベンチマーク結果からGLM-5のステルスリリースではないかと推測され、智譜AIが後に公式に認めました。
+**3ステップで始められます：**
+1. [z.ai/subscribe](https://z.ai/subscribe) でプランを選択・登録
+2. APIキーを取得
+3. お使いのツールにAPIキーを設定
 
-## 智譜AIの躍進
+以下のツールに対応しています：
 
-智譜AIは2019年に清華大学のスピンオフとして設立され、2026年1月8日に香港証券取引所に上場しました。IPOで約5.58億ドル（約830億円）を調達し、**世界初の上場基盤モデル企業**となっています。
+| ツール | 対応状況 |
+|--------|---------|
+| Claude Code | ✅ |
+| Cursor | ✅ |
+| Cline | ✅ |
+| OpenCode | ✅ |
+| Roo Code | ✅ |
+| Kilo Code | ✅ |
+| Goose | ✅ |
+| OpenClaw | ✅ |
 
-GLM-5の発表後、株価は最大34%急騰し、市場からの期待の高さを示しています。
+各ツールの設定方法は、プラン登録後のダッシュボードに記載されています。基本的には**API ProviderをOpenAI Compatibleに変更してAPIキーを入力するだけ**です。
 
-## まとめ
+### 方法2: chat.z.aiで試す（無料）
 
-GLM-5の特徴をまとめると：
+[chat.z.ai](https://chat.z.ai) にアクセスすれば、ブラウザ上で直接GLM-5を試せます。新規登録で無料クレジットが付与されるので、**契約前にまず実力を確認したい方はこちら**がおすすめです。
 
-- ✅ 744Bパラメータ（40Bアクティブ）のMoEアーキテクチャ
-- ✅ SWE-bench Verified 77.8%でOSSモデル世界最高
-- ✅ ハルシネーション率がAI業界トップの低さ
-- ✅ Word/PDF/Excelを自動生成するAgent Mode
-- ✅ Huawei Ascendチップのみで訓練（米国GPU非依存）
+### 方法3: OpenRouter経由
+
+すでにOpenRouterを使っている方は、モデル指定を`zai/glm-5`に変えるだけです。
+
+### 方法4: セルフホスティング（上級者向け）
+
+[Hugging Face](https://huggingface.co/zai-org/GLM-5)からMITライセンスでウェイトをダウンロードし、自社サーバーで運用できます。vLLM / SGLangに対応。ただし推論に**約1,490GBのメモリ**が必要なため、マルチGPU環境が必須です。
+
+## GLM-5の技術的な裏側
+
+### アーキテクチャ
+
+GLM-5はMixture-of-Experts（MoE）構造を採用。256個のエキスパートからトークンごとに8個だけを活性化するため、744Bの巨大モデルでありながら推論コストは40B相当に抑えられています。
+
+さらにDeepSeek Sparse Attention（DSA）を統合し、200Kトークンの長文脈を効率的に処理します。
+
+### Huawei Ascendチップで完全独立訓練
+
+GLM-5はHuawei AscendチップとMindSporeフレームワークのみで訓練されており、米国製GPU（NVIDIA A100/H100）に一切依存していません。
+
+### 「slime」：新しい強化学習基盤
+
+智譜AIが独自開発した非同期RL基盤「slime」により、ハルシネーション率の劇的な低下とエージェント能力の大幅向上を実現しています。
+
+## 「Pony Alpha」の正体はGLM-5だった
+
+2026年2月上旬、OpenRouterに「**Pony Alpha**」という謎のモデルが突如登場し、コーディング能力でClaude Opusに迫ると話題になりました。その正体がGLM-5のステルスリリースだったことが後に判明。正体が明かされる前から実力が認められていたことが、GLM-5の実力を何より証明しています。
+
+## まとめ：性能は同等、コストは1/10
+
+GLM-5を一言でまとめると：
+
+:::message
+**Claude Opus 4.5の96%のコーディング性能を、1/10の料金で使える。**
+:::
+
+- ✅ SWE-bench Verified 77.8%（OSS世界最高）
+- ✅ Claude Code / Cursor / Cline / OpenCode など20以上のツール対応
+- ✅ GLM Coding Plan Pro なら**月わずか$10**
+- ✅ 5時間サイクル制で予想外の高額請求なし
+- ✅ ハルシネーション率が業界最低水準
+- ✅ Agent Modeでドキュメント自動生成
 - ✅ MITライセンスで完全オープンソース
 
-オープンソースでありながらClaude Opus 4.5に迫るコーディング能力を持つGLM-5は、自社環境でのデプロイやカスタマイズを検討している開発者にとって有力な選択肢です。特にAgent Modeによるドキュメント自動生成は、業務効率化に直結する実用的な機能と言えるでしょう。
+「AIコーディングにお金をかけすぎている」と感じている方は、まず[chat.z.ai](https://chat.z.ai)で無料で試してみてください。実力に納得したら、[GLM Coding Plan](https://z.ai/subscribe)で本格導入がおすすめです。
 
 ## 参考リンク
 
 - [GLM-5 公式GitHub](https://github.com/zai-org/GLM-5)
 - [Hugging Face モデルカード](https://huggingface.co/zai-org/GLM-5)
-- [智譜AI公式サイト](https://www.zhipuai.cn/en)
 - [GLM Coding Plan](https://z.ai/subscribe)
 - [GLM-5 APIドキュメント](https://docs.bigmodel.cn/cn/guide/models/text/glm-5)
+- [智譜AI公式サイト](https://www.zhipuai.cn/en)
 - [GIGAZINE - GLM-5解説記事](https://gigazine.net/gsc_news/en/20260212-z-ai-glm-5/)
 - [VentureBeat - GLM-5のslime技術](https://venturebeat.com/technology/z-ais-open-source-glm-5-achieves-record-low-hallucination-rate-and-leverages)
 - [Medium - GLM Coding Planレビュー](https://medium.com/@elio.verhoef/glm-coding-plan-how-i-get-3-claude-max-code-usage-for-30-month-07503db5eeb2)
