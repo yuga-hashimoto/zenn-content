@@ -101,9 +101,24 @@ GLM-5は**AA-Omniscience Index**でスコア-1を記録し、前世代から35�
 | τ²-Bench | 複雑なマルチツールシナリオ | OSS最高 |
 | Vending Bench 2 | 長期計画・意思決定 | $4,432（OSS最高） |
 
-## Agent Mode：ドキュメント自動生成
+## GLM-5は何に使えるのか？
 
-GLM-5のネイティブ**Agent Mode**は、プロンプトやソース素材から直接オフィスドキュメントを生成できます。
+GLM-5は汎用LLMですが、特に以下の用途で強みを発揮します。
+
+### 1. AIコーディングアシスタント
+
+SWE-bench Verified 77.8%が示す通り、**実際のGitHub Issueを解決できるレベル**のコーディング能力を持っています。
+
+- バグ修正・機能追加の自動実装
+- コードレビュー・リファクタリング
+- テストコード生成
+- **Claude Code / Cline / Roo Code / Kilo Code** などの主要コーディングツールで直接利用可能
+
+特にClaude MaxやCursor Proの料金（月$100〜$200）が負担に感じている開発者にとって、GLM-5は**圧倒的に安い代替手段**です。
+
+### 2. ドキュメント・事務作業の自動化（Agent Mode）
+
+GLM-5のネイティブ**Agent Mode**は、プロンプトから直接オフィスドキュメントを生成できます。
 
 - 📝 **Word文書**（.docx）：書式設定・表・図の挿入付き
 - 📊 **Excel**（.xlsx）：データ整理・グラフ生成
@@ -121,11 +136,49 @@ graph TD
     F --> I[チャート付きレポート]
 ```
 
-智譜AIはこの機能を「**Vibe CodingからAgentic Engineeringへの転換**」と表現しています。
+会議資料、レポート、データ分析表などの定型業務を大幅に効率化できます。
 
-## 使い方
+### 3. エージェントタスク・情報収集
 
-### API利用（OpenAI互換）
+BrowseComp・MCP-Atlas・τ²-Benchで全てOSS最高スコアを記録しており、以下のようなマルチステップタスクが得意です。
+
+- Web検索→情報統合→レポート作成
+- 複数ツールを組み合わせた多段階ワークフロー
+- 長期的な計画立案と意思決定
+
+### 4. オンプレミス・プライベート環境でのAI活用
+
+MITライセンスのオープンソースなので、**自社サーバーに完全にデプロイ可能**です。機密データを外部に出せない企業にとって、API型サービスでは実現できない利用形態です。
+
+## どうやって使うのか？
+
+GLM-5を利用する方法は大きく4つあります。
+
+### 方法1: GLM Coding Plan（最もお手軽）
+
+**コーディングツールで使うなら最もコスパが良い方法**です。Claude Code、Cline、Roo Codeなど20以上のツールに対応しています。
+
+**ステップ：**
+1. [z.ai/subscribe](https://z.ai/subscribe) にアクセス
+2. プランを選択して登録
+3. APIキーを取得
+4. お使いのコーディングツールにAPIキーを設定
+
+**Claude Codeでの設定例：**
+```bash
+# Claude Codeの設定でAPIプロバイダーを変更
+claude config set apiProvider openai-compatible
+claude config set apiBaseUrl https://open.bigmodel.cn/api/paas/v4
+claude config set apiKey YOUR_GLM_API_KEY
+claude config set model glm-5
+```
+
+**Clineでの設定：**
+VSCodeのCline拡張設定で、API ProviderをOpenAI Compatibleに変更し、Base URLとAPIキーを入力するだけです。
+
+### 方法2: API直接利用（OpenAI互換）
+
+自前のアプリケーションに組み込む場合はこちら。OpenAI SDKがそのまま使えます。
 
 ```python
 import openai
@@ -146,7 +199,11 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-### OpenRouter経由
+Java SDKも提供されています（`zai-sdk` v0.3.3）。
+
+### 方法3: OpenRouter経由
+
+すでにOpenRouterを使っている方はモデル指定を変えるだけです。
 
 ```python
 import openai
@@ -164,9 +221,9 @@ response = client.chat.completions.create(
 )
 ```
 
-### セルフホスティング
+### 方法4: セルフホスティング（上級者向け）
 
-Hugging Faceでウェイトが公開されています。
+Hugging FaceからMITライセンスでウェイトをダウンロードし、自社サーバーで運用できます。
 
 ```bash
 # Hugging Faceからダウンロード
@@ -180,15 +237,48 @@ python -m vllm.entrypoints.openai.api_server \
 
 - **vLLM / SGLang** で動作
 - FP8量子化版も提供
+- **必要メモリ: 約1,490GB**（マルチGPU環境が必須）
 
-## 料金
+### 方法5: chat.z.aiで試す（無料お試し）
 
-| 項目 | 価格 |
-|------|------|
-| 入力トークン | $0.80〜1.00 / 百万トークン |
-| 出力トークン | $2.56〜3.20 / 百万トークン |
+[chat.z.ai](https://chat.z.ai) にアクセスすれば、ブラウザ上で直接GLM-5を試せます。新規登録で無料クレジットが付与されるので、まずはここで実力を確認するのがおすすめです。
 
-OpenRouter経由またはchat.z.aiから利用可能です。
+## いくらかかるのか？
+
+### GLM Coding Plan（コーディングツール向けサブスクリプション）
+
+Claude Code / Cline / Roo Codeなどで使う場合の**定額プラン**です。
+
+| プラン | 料金 | 5時間あたりの利用量 | GLM-5対応 |
+|--------|------|---------------------|-----------|
+| **Lite** | $6/月 | 約120プロンプト | 近日対応予定 |
+| **Pro** | $30/四半期（≒$10/月） | 約600プロンプト | ✅ |
+| **Max** | $60/四半期（≒$20/月） | 約2,400プロンプト | ✅ |
+
+:::message
+**Claude Max（$100〜$200/月）と比較すると1/10〜1/30の料金**で、同等レベルのAIコーディング支援を受けられます。
+:::
+
+> 既存ユーザーは現行価格が維持されますが、GLM-5リリースに伴い新規登録者は30〜60%の値上げが適用されています。
+
+### API従量課金
+
+アプリケーションに組み込む場合の料金です。
+
+| モデル | 入力（/百万トークン） | 出力（/百万トークン） |
+|--------|----------------------|----------------------|
+| **GLM-5** | $1.00 | $3.20 |
+| Claude Opus 4.6 | $5.00 | $25.00 |
+| GPT-5.2 | $1.75 | $14.00 |
+| Gemini 3.0 Pro | $2.00 | $12.00 |
+
+:::message alert
+GLM-5のAPI料金はClaude Opus 4.6と比較して**入力5倍、出力約8倍安い**です。性能差を考慮しても圧倒的なコストパフォーマンスです。
+:::
+
+### セルフホスティング
+
+モデルウェイト自体は**MITライセンスで無料**です。ただし、推論に約1,490GBのメモリが必要なため、ハードウェアコストは相応にかかります。クラウドGPUインスタンスを利用する場合、8×H100構成で$20〜30/時間程度が目安です。
 
 ## 「Pony Alpha」の正体
 
@@ -218,5 +308,8 @@ GLM-5の特徴をまとめると：
 - [GLM-5 公式GitHub](https://github.com/zai-org/GLM-5)
 - [Hugging Face モデルカード](https://huggingface.co/zai-org/GLM-5)
 - [智譜AI公式サイト](https://www.zhipuai.cn/en)
+- [GLM Coding Plan](https://z.ai/subscribe)
+- [GLM-5 APIドキュメント](https://docs.bigmodel.cn/cn/guide/models/text/glm-5)
 - [GIGAZINE - GLM-5解説記事](https://gigazine.net/gsc_news/en/20260212-z-ai-glm-5/)
 - [VentureBeat - GLM-5のslime技術](https://venturebeat.com/technology/z-ais-open-source-glm-5-achieves-record-low-hallucination-rate-and-leverages)
+- [Medium - GLM Coding Planレビュー](https://medium.com/@elio.verhoef/glm-coding-plan-how-i-get-3-claude-max-code-usage-for-30-month-07503db5eeb2)
