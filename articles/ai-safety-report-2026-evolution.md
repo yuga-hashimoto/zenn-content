@@ -1,5 +1,5 @@
 ---
-title: "【2026年最新】GPT-5, Opus 4.5, Gemini 3... AI安全性レポートが明かす推論モデルの進化と自律エージェントの現在地"
+title: "AI安全性レポート2026: 推論モデルの進化と自律エージェントの現在地"
 emoji: "🤖"
 type: "tech"
 topics: ["AI", "MachineLearning", "LLM", "TechTrends", "DevOps"]
