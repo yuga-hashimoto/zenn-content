@@ -3,7 +3,7 @@ title: "NASAのPerserverance roverが火星で初のAI自律走行を達成"
 emoji: "🚀"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AI", "NASA", "火星探査", "自律走行", "宇宙開発"]
-published: false
+published: true
 ---
 
 # NASAのPerserverance roverが火星で初のAI自律走行を達成
